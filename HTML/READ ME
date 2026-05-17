@@ -1,0 +1,19 @@
+🎉 Que ótimo! Você acabou de criar seu primeiro app desktop com HTML/JS!
+
+Agora que está rodando, algumas ideias para evoluir o projeto e ir aprendendo:
+
+**Fácil — bom para começar:**
+- Mudar as cores e fontes no CSS
+- Adicionar um som de alarme quando terminar (`new Audio('arquivo.mp3').play()`)
+- Colocar uma mensagem diferente para cada modo
+
+**Médio:**
+- Salvar o modo preferido (usando `localStorage`)
+- Adicionar animação no número do timer
+- Colocar notificação nativa do Mac quando terminar
+
+**Mais avançado:**
+- Empacotar como `.app` de verdade com `electron-builder`
+- Adicionar ícone personalizado no Dock
+
+Quer partir para alguma dessas, ou tem outra ideia de app para fazer do zero?

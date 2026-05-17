@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head> 
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: #FFFDF7;
+      color: #2C2C2A;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 24px;
+      height: 100vh;
+      user-select: none;
+    }
+
+    h1 { font-size: 20px; font-weight: normal; margin-bottom: 4px; }
+    .sub { font-size: 11px; color: #888; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 28px; }
+
+    .modes { display: flex; gap: 8px; margin-bottom: 32px; }
+
+    .mode-btn {
+      border: 1px solid #D3D1C7;
+      background: white;
+      border-radius: 8px;
+      padding: 10px 8px;
+      cursor: pointer;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      text-align: center;
+      width: 76px;
+      transition: all 0.15s;
+    }
+
+    .mode-btn:hover { background: #F1EFE8; }
+
+    .mode-btn.active.soft   { border: 2px solid #EF9F27; background: #FAEEDA; }
+    .mode-btn.active.medium { border: 2px solid #BA7517; background: #FAEEDA; }
+    .mode-btn.active.hard   { border: 2px solid #854F0B; background: #FAEEDA; }
+    .mode-btn.active.salad  { border: 2px solid #0F6E56; background: #E1F5EE; }
+
+    .emoji { font-size: 24px; display: block; margin-bottom: 4px; }
+    .mode-name { font-weight: bold; display: block; }
+    .mode-time { color: #888; display: block; margin-top: 2px; }
+
+    .timer-display {
+      font-size: 72px;
+      font-weight: bold;
+      letter-spacing: -2px;
+      margin-bottom: 8px;
+      min-width: 160px;
+      text-align: center;
+    }
+
+    .mode-label {
+      font-size: 12px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+    }
+
+    .status {
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 28px;
+      min-height: 18px;
+      text-align: center;
+    }
+
+    .controls { display: flex; gap: 10px; }
+
+    .ctrl-btn {
+      border: 1px solid #D3D1C7;
+      background: white;
+      border-radius: 8px;
+      padding: 10px 28px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.1s;
+    }
+
+    .ctrl-btn:hover { background: #F1EFE8; }
+    .ctrl-btn:active { transform: scale(0.97); }
+
+    .ctrl-btn.primary {
+      background: #2C2C2A;
+      color: white;
+      border-color: #2C2C2A;
+    }
+
+    .ctrl-btn.primary:hover { background: #444; }
+
+    .done { color: #0F6E56; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <h1>🥚 temporizador de ovos</h1>
+  <p class="sub">selecione o ponto</p>
+
+  <div class="modes">
+    <button class="mode-btn soft active" onclick="selectMode('soft')">
+      <span class="emoji">🥚</span>
+      <span class="mode-name">Mole</span>
+      <span class="mode-time">4 min</span>
+    </button>
+    <button class="mode-btn medium" onclick="selectMode('medium')">
+      <span class="emoji">🍳</span>
+      <span class="mode-name">Médio</span>
+      <span class="mode-time">6 min</span>
+    </button>
+    <button class="mode-btn hard" onclick="selectMode('hard')">
+      <span class="emoji">🥚</span>
+      <span class="mode-name">Duro</span>
+      <span class="mode-time">10 min</span>
+    </button>
+    <button class="mode-btn salad" onclick="selectMode('salad')">
+      <span class="emoji">🥗</span>
+      <span class="mode-name">Salada</span>
+      <span class="mode-time">12 min</span>
+    </button>
+  </div>
+
+  <div class="timer-display" id="display">4:00</div>
+  <div class="mode-label" id="mode-label">mole</div>
+  <div class="status" id="status">pronto para começar</div>
+
+  <div class="controls">
+    <button class="ctrl-btn primary" id="start-btn" onclick="toggle()">Iniciar</button>
+    <button class="ctrl-btn" onclick="reset()">Reset</button>
+  </div>
+
+  <script>
+    const MODES = {
+      soft:   { label: 'mole',   seconds: 240 },
+      medium: { label: 'médio',  seconds: 360 },
+      hard:   { label: 'duro',   seconds: 600 },
+      salad:  { label: 'salada', seconds: 720 },
+    }
+
+    let current = 'soft'
+    let total = 240
+    let remaining = 240
+    let running = false
+    let interval = null
+
+    function fmt(s) {
+      return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
+    }
+
+    function selectMode(mode) {
+      if (running) return
+      current = mode
+      total = MODES[mode].seconds
+      remaining = total
+      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'))
+      document.querySelector('.mode-btn.' + mode).classList.add('active')
+      document.getElementById('mode-label').textContent = MODES[mode].label
+      document.getElementById('display').textContent = fmt(remaining)
+      document.getElementById('status').innerHTML = 'pronto para começar'
+      document.getElementById('start-btn').textContent = 'Iniciar'
+    }
+
+    function toggle() {
+      if (remaining === 0) { reset(); return }
+      running = !running
+      document.getElementById('start-btn').textContent = running ? 'Pausar' : 'Continuar'
+      if (running) {
+        interval = setInterval(() => {
+          remaining--
+          document.getElementById('display').textContent = fmt(remaining)
+          if (remaining > 0) {
+            document.getElementById('status').textContent = `cozinhando... ${fmt(remaining)} restantes`
+          } else {
+            clearInterval(interval)
+            running = false
+            document.getElementById('start-btn').textContent = 'Iniciar'
+            document.getElementById('status').innerHTML = '<span class="done">✅ pronto! retire o ovo agora</span>'
+          }
+        }, 1000)
+      } else {
+        clearInterval(interval)
+      }
+    }
+
+    function reset() {
+      clearInterval(interval)
+      running = false
+      remaining = total
+      document.getElementById('display').textContent = fmt(remaining)
+      document.getElementById('status').textContent = 'pronto para começar'
+      document.getElementById('start-btn').textContent = 'Iniciar'
+    }
+  </script>
+</body>
+</html>
