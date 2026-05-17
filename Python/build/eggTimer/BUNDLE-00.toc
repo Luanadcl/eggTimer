@@ -1,3 +1,0 @@
-([('eggTimer',
-   '/Users/luanadcl/Documents/VSCode/Egg TImer/dist/eggTimer',
-   'EXECUTABLE')],)
